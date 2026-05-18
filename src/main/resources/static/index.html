@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동물 상식</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .btn-group {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-dog {
+            background-color: #4CAF50;
+        }
+        .btn-dog:hover {
+            background-color: #45a049;
+        }
+        .btn-cat {
+            background-color: #2196F3;
+        }
+        .btn-cat:hover {
+            background-color: #0b7dda;
+        }
+        #fact-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #555;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>동물 상식 알아보기 🐾</h1>
+
+    <div class="btn-group">
+        <button class="btn-dog" onclick="fetchDogFact()">🐶 강아지 상식</button>
+        <button class="btn-cat" onclick="fetchCatFact()">🐱 고양이 상식</button>
+    </div>
+
+    <div id="fact-container">
+        버튼을 눌러 상식을 확인해보세요!
+    </div>
+</div>
+
+<script>
+    // 강아지 상식 가져오기
+    function fetchDogFact() {
+        const container = document.getElementById('fact-container');
+        container.innerHTML = "<em>강아지 상식을 불러오는 중...</em>";
+
+        fetch('/api/dog-fact')
+            .then(response => response.json())
+            .then(json => {
+                // dog api의 JSON 구조: json.data[0].attributes.body
+                if (json.data && json.data.length > 0 && json.data[0].attributes) {
+                    container.innerHTML = "<strong>🐶 강아지 상식 : </strong>" + json.data[0].attributes.body;
+                } else {
+                    container.innerHTML = "상식을 불러올 수 없습니다.";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching dog fact:', error);
+                container.innerHTML = "서버 통신 중 오류가 발생했습니다.";
+            });
+    }
+
+    // 고양이 상식 가져오기
+    function fetchCatFact() {
+        const container = document.getElementById('fact-container');
+        container.innerHTML = "<em>고양이 상식을 불러오는 중...</em>";
+
+        fetch('/api/cat-fact')
+            .then(response => response.json())
+            .then(json => {
+                // cat api의 JSON 구조: json.fact
+                if (json.fact) {
+                    container.innerHTML = "<strong>🐱 고양이 상식 : </strong>" + json.fact;
+                } else {
+                    container.innerHTML = "상식을 불러올 수 없습니다.";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching cat fact:', error);
+                container.innerHTML = "서버 통신 중 오류가 발생했습니다.";
+            });
+    }
+</script>
+
+</body>
+</html>
