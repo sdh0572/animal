@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 / 회원가입</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 40px auto;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #5cb85c;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        .form-footer {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .form-footer a {
+            color: #0275d8;
+            text-decoration: none;
+        }
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        .home-link {
+            display: block;
+            margin-top: 20px;
+            color: #333;
+            text-decoration: none;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="login-form">
+        <h2>로그인</h2>
+        <form onsubmit="handleLogin(event)">
+            <input type="text" id="login-userId" placeholder="아이디" required>
+            <input type="password" id="login-password" placeholder="비밀번호" required>
+            <button type="submit">로그인</button>
+        </form>
+        <div class="form-footer">
+            계정이 없으신가요? <a href="#" onclick="toggleForms()">회원가입</a>
+        </div>
+    </div>
+
+    <div class="container" id="register-form" style="display:none;">
+        <h2>회원가입</h2>
+        <form onsubmit="handleSignup(event)">
+            <input type="text" id="signup-userId" placeholder="아이디" required>
+            <input type="password" id="signup-password" placeholder="비밀번호" required>
+            <input type="password" id="signup-password-confirm" placeholder="비밀번호 확인" required>
+            <button type="submit">회원가입</button>
+        </form>
+        <div class="form-footer">
+            이미 계정이 있으신가요? <a href="#" onclick="toggleForms()">로그인</a>
+        </div>
+    </div>
+
+    <a href="/" class="home-link">홈으로 돌아가기</a>
+
+<script>
+    // 로그인/회원가입 폼 전환
+    function toggleForms() {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        // 입력 필드 초기화
+        document.getElementById('login-userId').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('signup-userId').value = '';
+        document.getElementById('signup-password').value = '';
+        document.getElementById('signup-password-confirm').value = '';
+
+        if (loginForm.style.display === 'none') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+    }
+
+    // 회원가입 처리
+    async function handleSignup(event) {
+        event.preventDefault(); // 폼 기본 제출 동작 방지
+
+        const userId = document.getElementById('signup-userId').value;
+        const password = document.getElementById('signup-password').value;
+        const passwordConfirm = document.getElementById('signup-password-confirm').value;
+
+        // 비밀번호 일치 여부 확인 (프론트엔드)
+        if (password !== passwordConfirm) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        const response = await fetch('/api/users/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, password })
+        });
+
+        if (response.ok) {
+            alert('회원가입에 성공했습니다! 로그인 페이지로 이동합니다.');
+            toggleForms(); // 로그인 폼으로 전환
+        } else {
+            const errorMessage = await response.text();
+            alert(`회원가입 실패: ${errorMessage}`);
+        }
+    }
+
+    // 로그인 처리
+    async function handleLogin(event) {
+        event.preventDefault();
+
+        const userId = document.getElementById('login-userId').value;
+        const password = document.getElementById('login-password').value;
+
+        const response = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, password })
+        });
+
+        if (response.ok) {
+            alert('로그인에 성공했습니다!');
+            window.location.href = '/'; // 메인 페이지로 이동
+        } else {
+            const errorMessage = await response.text();
+            alert(`로그인 실패: ${errorMessage}`);
+        }
+    }
+</script>
+
+</body>
+</html>
